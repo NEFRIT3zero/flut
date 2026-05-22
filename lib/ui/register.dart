@@ -1,5 +1,6 @@
+import 'package:flut/services/db_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flut/user.dart';
+import 'package:flut/models/user.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -94,7 +95,7 @@ class _Register extends State<Register> {
         login: loginController.text,
         password: passwordController.text,
       );
-      users.add(user);
+      DatabaseController().insertUser(user);
       Navigator.pop(context);
       ScaffoldMessenger.of(
         context,

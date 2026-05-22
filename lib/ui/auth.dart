@@ -1,16 +1,19 @@
-import 'package:flut/shop.dart';
+import 'package:flut/services/db_controller.dart';
+import 'package:flut/ui/shop.dart';
 import 'package:flutter/material.dart';
-import 'package:flut/register.dart';
-import 'package:flut/user.dart';
+import 'package:flut/ui/register.dart';
+import 'package:flut/models/user.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flut/services/user_provider.dart';
 
-class Auth extends StatefulWidget {
+class Auth extends ConsumerStatefulWidget {
   const Auth({super.key});
 
   @override
-  State<Auth> createState() => _AuthState();
+  ConsumerState<Auth> createState() => _AuthState();
 }
 
-class _AuthState extends State<Auth> {
+class _AuthState extends ConsumerState<Auth> {
   var controllerLog = TextEditingController();
   var controllerPass = TextEditingController();
 
@@ -59,22 +62,27 @@ class _AuthState extends State<Auth> {
     );
   }
 
-  void onLogin() {
-    for (var user in users) {
-      if (user.login == controllerLog.text &&
-          user.password == controllerPass.text) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => Shop(),
-            // MyFirstPage(tittle: 'Main Page', name: user.name),
-          ),
-        );
-        return;
-      }
+  void onLogin() async {
+    User? user = await DatabaseController.instance.authorizeUser(
+      controllerLog.text,
+      controllerPass.text,
+    );
+
+    if (user != null) {
+      ref.read(userProvider.notifier).login(user);
+
+      if (!mounted) return;
+
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (context) => Shop()));
+
+      return;
     }
+
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text('Неверный пароль или логин')));
+    ).showSnackBar(const SnackBar(content: Text('Неверный пароль или логин')));
   }
 
   void onRegister() {

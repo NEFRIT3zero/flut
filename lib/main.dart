@@ -1,10 +1,28 @@
+import 'package:flut/services/db_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flut/auth.dart';
+import 'package:flut/ui/auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 //import 'package:flutter_application_2/register.dart';
 //import 'package:flutter_application_2/first_page.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final db = await DatabaseController().database;
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await DatabaseController.instance.syncFromFirebase();
+  print('init db: $db');
+
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
