@@ -1,5 +1,7 @@
 import 'package:flut/services/db_controller.dart';
 import 'package:flut/models/product.dart';
+import 'package:flut/ui/my_colors.dart';
+import 'package:flut/ui/placeholder_image.dart';
 import 'package:flutter/material.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'dart:io';
@@ -15,43 +17,119 @@ class ProductsDetails extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productsAsync = ref.watch(productProvider);
+
     return Scaffold(
-      appBar: AppBar(),
-      body: productsAsync.when(
-        data: (products) {
-          final currentProduct = products.firstWhere(
-            (p) => p.qrData == product.qrData,
-          );
-
-          return Column(
-            children: [
-              Image.file(File(currentProduct.pathImage), height: 200),
-
-              Text(currentProduct.name),
-
-              ElevatedButton(
-                onPressed: () {
-                  reserve(context, ref, currentProduct);
-                },
-                child: Text(
-                  currentProduct.reservedBy == null
-                      ? 'Забронировать'
-                      : 'Забронировано пользователем ${currentProduct.reservedBy}',
-                ),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: MyColors.textLight),
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [MyColors.gradientStart, MyColors.gradientEnd],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: productsAsync.when(
+              loading: () => const CircularProgressIndicator(
+                color: MyColors.textLight,
               ),
-              SizedBox(height: 16),
-              PrettyQrView.data(data: product.qrData),
-            ],
-          );
-        },
+              error: (e, _) => Text(
+                '$e',
+                style: const TextStyle(color: MyColors.errorSnack),
+              ),
+              data: (products) {
+                final currentProduct = products.firstWhere(
+                  (p) => p.qrData == product.qrData,
+                );
 
-        loading: () => CircularProgressIndicator(),
-
-        error: (e, _) => Text('$e'),
+                // Wrap the whole content in a card (Auth card style)
+                return Card(
+                  margin: const EdgeInsets.all(16),
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  color: MyColors.cardBg,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Image with error handling
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: Image.file(
+                            File(currentProduct.pathImage),
+                            height: 200,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                PlaceholderImage(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          currentProduct.name,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: MyColors.textLight,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              reserve(context, ref, currentProduct);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: MyColors.buttonBg,
+                              foregroundColor: MyColors.buttonFg,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              elevation: 2,
+                            ),
+                            child: Text(
+                              currentProduct.reservedBy == null
+                                  ? 'Забронировать'
+                                  : 'Забронировано пользователем ${currentProduct.reservedBy}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Container(
+                                color: Colors.white,
+                                padding: const EdgeInsets.all(8),
+                                child: PrettyQrView.data(data: product.qrData),
+                            ),
+                            ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
       ),
     );
   }
 
+  // --- helper methods (unchanged) ---
   Future<Product?> getUpdatedProduct() async {
     return await DatabaseController.instance.getProductByQrCode(product.qrData);
   }
@@ -70,8 +148,13 @@ class ProductsDetails extends ConsumerWidget {
       return;
     }
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Товар уже забронирован')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Товар уже забронирован'),
+        backgroundColor: MyColors.errorSnack,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 }
