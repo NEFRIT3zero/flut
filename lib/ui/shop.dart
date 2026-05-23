@@ -8,38 +8,91 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flut/services/product_provider.dart';
 
+import 'dart:math' as math;
 
-
-// ---------------------------------------------------------------------------
-// Custom triangular shape for the FloatingActionButton
-// ---------------------------------------------------------------------------
 class TriangleBorder extends ShapeBorder {
-  const TriangleBorder();
+  final double borderRadius;
+
+  const TriangleBorder({this.borderRadius = 0.0});
 
   @override
   EdgeInsetsGeometry get dimensions => EdgeInsets.zero;
 
   @override
-  Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
-    return getOuterPath(rect, textDirection: textDirection);
-  }
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) =>
+      getOuterPath(rect, textDirection: textDirection);
 
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
     final double w = rect.width;
-    final double h = rect.height;
-    // Upward‑pointing triangle: tip at top centre, base at bottom
-    return Path()
-      ..moveTo(w / 2, 0)   // tip
-      ..lineTo(w, h)       // bottom‑right
-      ..lineTo(0, h)       // bottom‑left
+    final double h = w * math.sqrt(3) / 2;
+
+    // Place the triangle so its centroid is at the centre of the FAB's rect
+    final double cx = rect.center.dx;
+    final double cy = rect.center.dy;
+    final double tipY = cy - 2 * h / 3; // centroid is 2h/3 below tip
+    final double bottomY = tipY + h;
+
+    final Offset v0 = Offset(cx, tipY); // top
+    final Offset v1 = Offset(rect.right, bottomY); // bottom-right
+    final Offset v2 = Offset(rect.left, bottomY); // bottom-left
+
+    // Sharp triangle when borderRadius <= 0
+    if (borderRadius <= 0.0) {
+      return Path()
+        ..moveTo(v0.dx, v0.dy)
+        ..lineTo(v1.dx, v1.dy)
+        ..lineTo(v2.dx, v2.dy)
+        ..close();
+    }
+
+    // Rounded triangle
+    final double r = math.min(borderRadius, h / 3); // max radius = inradius
+    final double d = r * math.sqrt(3); // tangent distance along edges
+
+    final List<Offset> vertices = [v0, v1, v2];
+
+    // Tangent points on the edges near each vertex
+    Offset tangentIn(int i) {
+      final Offset prev = vertices[(i - 1 + 3) % 3];
+      final Offset curr = vertices[i];
+      final Offset dir = (prev - curr);
+      final double len = dir.distance;
+      return len == 0 ? curr : curr + (dir / len) * d;
+    }
+
+    Offset tangentOut(int i) {
+      final Offset next = vertices[(i + 1) % 3];
+      final Offset curr = vertices[i];
+      final Offset dir = (next - curr);
+      final double len = dir.distance;
+      return len == 0 ? curr : curr + (dir / len) * d;
+    }
+
+    final Offset pt_in0 = tangentIn(0);
+    final Offset pt_out0 = tangentOut(0);
+    final Offset pt_in1 = tangentIn(1);
+    final Offset pt_out1 = tangentOut(1);
+    final Offset pt_in2 = tangentIn(2);
+    final Offset pt_out2 = tangentOut(2);
+
+    final Path path = Path()
+      ..moveTo(pt_in0.dx, pt_in0.dy)
+      // Arc around top vertex
+      ..conicTo(v0.dx, v0.dy, pt_out0.dx, pt_out0.dy, 0.5)
+      ..lineTo(pt_in1.dx, pt_in1.dy)
+      // Arc around bottom-right vertex
+      ..conicTo(v1.dx, v1.dy, pt_out1.dx, pt_out1.dy, 0.5)
+      ..lineTo(pt_in2.dx, pt_in2.dy)
+      // Arc around bottom-left vertex
+      ..conicTo(v2.dx, v2.dy, pt_out2.dx, pt_out2.dy, 0.5)
       ..close();
+
+    return path;
   }
 
   @override
-  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
-    // ShapeDecoration & FloatingActionButton handle the painting automatically
-  }
+  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {}
 
   @override
   ShapeBorder scale(double t) => this;
@@ -59,10 +112,7 @@ class Shop extends ConsumerWidget {
     final appBar = AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      title: const Text(
-        'Shop',
-        style: TextStyle(color: MyColors.textLight),
-      ),
+      title: const Text('Shop', style: TextStyle(color: MyColors.textLight)),
       actions: [
         IconButton(
           icon: const Icon(Icons.qr_code_scanner, color: MyColors.textLight),
@@ -88,9 +138,9 @@ class Shop extends ConsumerWidget {
         tooltip: 'Add product',
         backgroundColor: MyColors.buttonBg,
         foregroundColor: MyColors.buttonFg,
-        shape: const TriangleBorder(),
-        elevation: 100,               // ← triangular shape
-        child: const Icon(Icons.add),
+        shape: const TriangleBorder(borderRadius: 8.0), // rounded corners
+        elevation: 100,
+        child: const Icon(Icons.add, color: Color.fromARGB(255, 0, 255, 0)), // centred automatically
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -110,9 +160,7 @@ class Shop extends ConsumerWidget {
               Expanded(
                 child: productsAsync.when(
                   loading: () => const Center(
-                    child: CircularProgressIndicator(
-                      color: MyColors.textLight,
-                    ),
+                    child: CircularProgressIndicator(color: MyColors.textLight),
                   ),
                   error: (error, stackTrace) => Center(
                     child: Padding(
@@ -120,25 +168,25 @@ class Shop extends ConsumerWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.error_outline,
-                              size: 48, color: MyColors.errorSnack),
+                          const Icon(
+                            Icons.error_outline,
+                            size: 48,
+                            color: MyColors.errorSnack,
+                          ),
                           const SizedBox(height: 16),
                           Text(
                             'Something went wrong',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
+                            style: Theme.of(context).textTheme.headlineSmall
                                 ?.copyWith(color: MyColors.textLight),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             '$error',
                             textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
+                            style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
-                                    color: MyColors.textLight.withOpacity(0.8)),
+                                  color: MyColors.textLight.withOpacity(0.8),
+                                ),
                           ),
                           const SizedBox(height: 24),
                           ElevatedButton.icon(
@@ -158,28 +206,44 @@ class Shop extends ConsumerWidget {
                     ),
                   ),
                   data: (products) {
-                    if (products.isEmpty) {
-                      return Center(
-                        child: Text(
-                          'No products yet.',
-                          style: TextStyle(
-                            color: MyColors.textLight.withOpacity(0.8),
-                            fontSize: 16,
-                          ),
-                        ),
-                      );
-                    }
-                    return ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 80),
-                      itemCount: products.length,
-                      itemBuilder: (context, index) {
-                        final product = products[index];
-                        return ProductCard(
-                          product: product,
-                          onPressed: () =>
-                              _openProductDetails(context, product),
-                        );
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        await ref.read(productProvider.notifier).refresh();
                       },
+                      child: products.isEmpty
+                          ? ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: [
+                                LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    return SizedBox(
+                                      height: constraints.maxHeight,
+                                      child: Center(
+                                        child: Text(
+                                          'No products yet.',
+                                          style: TextStyle(
+                                            color: MyColors.textLight.withOpacity(0.8),
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            )
+                          : ListView.builder(
+                              padding: const EdgeInsets.only(bottom: 80),
+                              itemCount: products.length,
+                              itemBuilder: (context, index) {
+                                final product = products[index];
+                                return ProductCard(
+                                  product: product,
+                                  onPressed: () =>
+                                      _openProductDetails(context, product),
+                                );
+                              },
+                            ),
                     );
                   },
                 ),
@@ -193,22 +257,20 @@ class Shop extends ConsumerWidget {
 
   // --- navigation helpers (unchanged) ---
   void _openCreateProduct(BuildContext context) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const CreateProduct()),
-    );
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const CreateProduct()));
   }
 
   void _openScanner(BuildContext context) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ScannerFind()),
-    );
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const ScannerFind()));
   }
 
   void _openProductDetails(BuildContext context, Product product) async {
     await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ProductsDetails(product: product),
-      ),
+      MaterialPageRoute(builder: (_) => ProductsDetails(product: product)),
     );
   }
 }
