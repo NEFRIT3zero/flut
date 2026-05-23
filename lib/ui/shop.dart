@@ -22,6 +22,7 @@ class Shop extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productsAsync = ref.watch(productProvider);
+    
 
     return productsAsync.when(
       loading: () => const CircularProgressIndicator(),
