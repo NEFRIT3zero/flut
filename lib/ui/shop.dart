@@ -107,6 +107,7 @@ class Shop extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productsAsync = ref.watch(productProvider);
+    
 
     // Build the AppBar once so we can use its exact toolbar height
     final appBar = AppBar(

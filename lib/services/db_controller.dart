@@ -36,7 +36,7 @@ class DatabaseController {
       CREATE TABLE products(
         qrData TEXT PRIMARY KEY NOT NULL,
         name TEXT NOT NULL,
-        pathImage TEXT,
+        imageBytes BLOB,
         reservedBy TEXT
       )
     ''');
@@ -122,14 +122,14 @@ class DatabaseController {
       whereArgs: [product.qrData],
     );
 
-    final updatedProduct = Product(
-      qrData: product.qrData,
-      name: product.name,
-      pathImage: product.pathImage,
-      reservedBy: user.login,
-    );
+    // final updatedProduct = Product(
+    //   qrData: product.qrData,
+    //   name: product.name,
+    //   imageBytes: product.imageBytes,
+    //   reservedBy: user.login,
+    // );
 
-    await FirebaseService.instance.uploadProduct(updatedProduct);
+    await FirebaseService.instance.updateProduct(product, user.login);
   }
 
   Future<void> unreserveProduct(Product product) async {
@@ -141,14 +141,14 @@ class DatabaseController {
       whereArgs: [product.qrData],
     );
 
-    final updatedProduct = Product(
-      qrData: product.qrData,
-      name: product.name,
-      pathImage: product.pathImage,
-      reservedBy: null,
-    );
+    // final updatedProduct = Product(
+    //   qrData: product.qrData,
+    //   name: product.name,
+    //   imageBytes: product.imageBytes,
+    //   reservedBy: null,
+    // );
 
-    await FirebaseService.instance.uploadProduct(updatedProduct);
+    await FirebaseService.instance.updateProduct(product, null);
   }
 
   //---------------------------------------------------------------

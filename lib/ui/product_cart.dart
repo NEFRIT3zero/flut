@@ -3,6 +3,7 @@ import 'package:flut/models/product.dart';
 import 'package:flut/ui/my_colors.dart';
 import 'package:flut/ui/placeholder_image.dart';
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
 
 class ProductCard extends StatelessWidget {
   const ProductCard({
@@ -32,7 +33,10 @@ class ProductCard extends StatelessWidget {
           children: [
             AspectRatio(
               aspectRatio: 16 / 9,
-              child: _ProductImage(path: product.pathImage),
+              child: Image.memory(
+                product.imageBytes,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => PlaceholderImage()),
             ),
             Padding(
               padding: const EdgeInsets.all(12),
@@ -47,6 +51,7 @@ class ProductCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+             
           ],
         ),
       ),

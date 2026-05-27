@@ -22,28 +22,31 @@ class _CreateProductState extends ConsumerState<CreateProduct> {
   final ImagePicker picker = ImagePicker();
   File? selectedImage;
   String? newImagePath;
+  Uint8List? imageBytes;
 
   Future<void> _pickImage() async {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      print('img choosed');
-      Directory appDir = await getApplicationDocumentsDirectory();
-      await Directory('${appDir.path}/images').create(recursive: true);
+      // print('img choosed');
+      // Directory appDir = await getApplicationDocumentsDirectory();
+      // await Directory('${appDir.path}/images').create(recursive: true);
 
-      File newImage = File(
-        '${appDir.path}/images/${DateTime.now().millisecondsSinceEpoch.toString()}.jpg',
-      );
-      print(
-        'generated directory ${appDir.path}/images/${DateTime.now().millisecondsSinceEpoch.toString()}.jpg',
-      );
+      // File newImage = File(
+      //   '${appDir.path}/images/${DateTime.now().millisecondsSinceEpoch.toString()}.jpg',
+      // );
+      // print(
+      //   'generated directory ${appDir.path}/images/${DateTime.now().millisecondsSinceEpoch.toString()}.jpg',
+      // );
 
-      Uint8List imageBytes = await image.readAsBytes();
-      await newImage.writeAsBytes(imageBytes);
-      print('img copy saved');
+      
+      // await newImage.writeAsBytes(imageBytes!);
+      Uint8List _imageBytes = await image.readAsBytes();
 
       setState(() {
         selectedImage = File(image.path);
-        newImagePath = newImage.path;
+        // newImagePath = newImage.path;
+        imageBytes = _imageBytes;
+        // print('img copy saved');
       });
     }
   }
@@ -218,7 +221,7 @@ class _CreateProductState extends ConsumerState<CreateProduct> {
           Product(
             qrData: controllerName.text + selectedImage.hashCode.toString(),
             name: controllerName.text,
-            pathImage: newImagePath!,
+            imageBytes: imageBytes!,
           ),
         );
     if (mounted) {
