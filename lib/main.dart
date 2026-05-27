@@ -16,7 +16,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await DatabaseController.instance.syncFromFirebase();
-  print('init db: $db');
+  // print('init db: $db');
 
   runApp(
     const ProviderScope(

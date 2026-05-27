@@ -25,7 +25,7 @@ class ProductsDetails extends ConsumerWidget {
 
           return Column(
             children: [
-              Image.file(File(currentProduct.pathImage), height: 200),
+              Image.memory(currentProduct.imageBytes, height: 200),
 
               Text(currentProduct.name),
 

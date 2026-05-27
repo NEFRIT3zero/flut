@@ -2,16 +2,19 @@
 
 
 
+import 'dart:convert';
+import 'dart:typed_data';
+
 class Product {
   String name;
-  String pathImage;
+  Uint8List imageBytes;
   String qrData;
   String? reservedBy;
 
   Product({
     required this.qrData, 
     required this.name, 
-    required this.pathImage, 
+    required this.imageBytes, 
     this.reservedBy
   });
 
@@ -19,7 +22,7 @@ class Product {
     return {
       'qrData': qrData,
       'name': name,
-      'pathImage': pathImage,
+      'imageBytes': base64Encode(imageBytes),
       'reservedBy': reservedBy,
     };
   }
@@ -28,7 +31,7 @@ class Product {
     return Product(
       qrData: map['qrData'],
       name: map['name'],
-      pathImage: map['pathImage'],
+      imageBytes: base64Decode(map['imageBytes']),
       reservedBy: map['reservedBy'],
     );
   }
