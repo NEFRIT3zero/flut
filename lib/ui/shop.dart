@@ -271,7 +271,7 @@ class Shop extends ConsumerWidget {
 
   void _openProductDetails(BuildContext context, Product product) async {
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => ProductsDetails(product: product)),
+      MaterialPageRoute(builder: (_) => ProductsDetails(product: product, autoRun: false,)),
     );
   }
 }

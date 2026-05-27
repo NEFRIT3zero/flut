@@ -1,5 +1,6 @@
 import 'package:flut/services/db_controller.dart';
 import 'package:flut/models/product.dart';
+import 'package:flut/services/providers.dart';
 import 'package:flut/ui/my_colors.dart';
 import 'package:flut/ui/placeholder_image.dart';
 import 'package:flutter/material.dart';
@@ -9,14 +10,47 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flut/services/user_provider.dart';
 import 'package:flut/services/product_provider.dart';
 
-class ProductsDetails extends ConsumerWidget {
-  const ProductsDetails({super.key, required this.product});
+class ProductsDetails extends ConsumerStatefulWidget {
+  const ProductsDetails({
+    super.key,
+    required this.product,
+    required this.autoRun,
+  });
 
   final Product product;
+  final bool autoRun;
+  @override
+  ConsumerState<ProductsDetails> createState() => _ProductsDetailsState();
+}
+
+class _ProductsDetailsState extends ConsumerState<ProductsDetails> {
+  @override
+  void initState() {
+    super.initState();
+
+    // run after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.autoRun) {
+       reserve(context, ref, widget.product);
+      }
+    });
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final productsAsync = ref.watch(productProvider);
+
+    // ref.listen<bool>(autoRunProvider, (previous, next) {
+    //   if (next == true) {
+    //     // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     //   _buttonLogic(ref);
+    //     // });
+    //     reserve(context, ref, product);
+    //     print('autopress button');
+    //     // Reset the flag after consumption to avoid repeated calls
+    //     ref.read(autoRunProvider.notifier).state = false;
+    //   }
+    // });
     // return Scaffold(
     //   appBar: AppBar(),
     //   body: productsAsync.when(
@@ -49,9 +83,7 @@ class ProductsDetails extends ConsumerWidget {
             builder: (context, constraints) {
               return SingleChildScrollView(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Center(
                     child: productsAsync.when(
                       loading: () => const CircularProgressIndicator(
@@ -63,7 +95,7 @@ class ProductsDetails extends ConsumerWidget {
                       ),
                       data: (products) {
                         final currentProduct = products.firstWhere(
-                          (p) => p.qrData == product.qrData,
+                          (p) => p.qrData == widget.product.qrData,
                         );
 
                         return Card(
@@ -82,10 +114,12 @@ class ProductsDetails extends ConsumerWidget {
                                   borderRadius: BorderRadius.circular(14),
                                   child: Image.memory(
                                     currentProduct.imageBytes,
-                                    width: double.infinity,  // fills card width
-                                    fit: BoxFit.fitWidth,    // height adjusts proportionally
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        PlaceholderImage(),
+                                    width: double.infinity, // fills card width
+                                    fit: BoxFit
+                                        .fitWidth, // height adjusts proportionally
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            PlaceholderImage(),
                                   ),
                                 ),
                                 const SizedBox(height: 16),
@@ -130,7 +164,9 @@ class ProductsDetails extends ConsumerWidget {
                                   child: Container(
                                     color: Colors.white,
                                     padding: const EdgeInsets.all(8),
-                                    child: PrettyQrView.data(data: product.qrData),
+                                    child: PrettyQrView.data(
+                                      data: widget.product.qrData,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -149,9 +185,8 @@ class ProductsDetails extends ConsumerWidget {
     );
   }
 
-  // --- helper methods (unchanged) ---
   Future<Product?> getUpdatedProduct() async {
-    return await DatabaseController.instance.getProductByQrCode(product.qrData);
+    return await DatabaseController.instance.getProductByQrCode(widget.product.qrData);
   }
 
   void reserve(BuildContext context, WidgetRef ref, Product product) async {

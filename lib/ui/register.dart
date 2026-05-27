@@ -3,7 +3,6 @@ import 'package:flut/ui/my_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flut/models/user.dart';
 
-
 class Register extends StatefulWidget {
   const Register({super.key});
 
@@ -41,7 +40,7 @@ class _RegisterState extends State<Register> {
         login: _loginController.text.trim(),
         password: _passwordController.text,
       );
-      await DatabaseController().insertUser(user);  
+      await DatabaseController().insertUser(user);
 
       if (!mounted) return;
       Navigator.pop(context);
@@ -50,7 +49,9 @@ class _RegisterState extends State<Register> {
           content: const Text('Пользователь зарегистрирован'),
           backgroundColor: MyColors.buttonBg,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       );
     } catch (e) {
@@ -60,7 +61,9 @@ class _RegisterState extends State<Register> {
             content: const Text('Ошибка регистрации. Попробуйте позже.'),
             backgroundColor: MyColors.errorSnack,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       }
@@ -90,7 +93,11 @@ class _RegisterState extends State<Register> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.person_add_alt_1, size: 80, color: MyColors.textLight),
+                      const Icon(
+                        Icons.person_add_alt_1,
+                        size: 80,
+                        color: MyColors.textLight,
+                      ),
                       const SizedBox(height: 16),
                       const Text(
                         'Создать аккаунт',
@@ -124,18 +131,24 @@ class _RegisterState extends State<Register> {
                                 controller: _nameController,
                                 autofillHints: const [AutofillHints.name],
                                 textInputAction: TextInputAction.next,
-                                autovalidateMode: AutovalidateMode.onUserInteraction,   // ← added
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
                                 decoration: InputDecoration(
                                   labelText: 'Имя',
-                                  labelStyle: TextStyle(color: MyColors.textHint),
+                                  labelStyle: TextStyle(
+                                    color: MyColors.textHint,
+                                  ),
                                   hintText: 'Ваше имя',
                                   prefixIcon: const Icon(Icons.badge_outlined),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
                                   ),
-                                  focusedBorder: OutlineInputBorder(                   // ← new
+                                  focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(color: MyColors.focusedBorder, width: 2),
+                                    borderSide: const BorderSide(
+                                      color: MyColors.focusedBorder,
+                                      width: 2,
+                                    ),
                                   ),
                                   filled: true,
                                   fillColor: MyColors.inputFill,
@@ -152,18 +165,24 @@ class _RegisterState extends State<Register> {
                                 controller: _loginController,
                                 autofillHints: const [AutofillHints.username],
                                 textInputAction: TextInputAction.next,
-                                autovalidateMode: AutovalidateMode.onUserInteraction,   // ← added
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
                                 decoration: InputDecoration(
                                   labelText: 'Логин',
-                                  labelStyle: TextStyle(color: MyColors.textHint),
+                                  labelStyle: TextStyle(
+                                    color: MyColors.textHint,
+                                  ),
                                   hintText: 'Придумайте логин',
                                   prefixIcon: const Icon(Icons.person_outline),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
                                   ),
-                                  focusedBorder: OutlineInputBorder(                   // ← new
+                                  focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(color: MyColors.focusedBorder, width: 2),
+                                    borderSide: const BorderSide(
+                                      color: MyColors.focusedBorder,
+                                      width: 2,
+                                    ),
                                   ),
                                   filled: true,
                                   fillColor: MyColors.inputFill,
@@ -178,69 +197,99 @@ class _RegisterState extends State<Register> {
                               const SizedBox(height: 20),
                               TextFormField(
                                 controller: _passwordController,
-                                autofillHints: const [AutofillHints.newPassword],
+                                autofillHints: const [
+                                  AutofillHints.newPassword,
+                                ],
                                 obscureText: _obscurePassword,
                                 textInputAction: TextInputAction.next,
-                                autovalidateMode: AutovalidateMode.onUserInteraction,   // ← added
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
                                 decoration: InputDecoration(
                                   labelText: 'Пароль',
-                                  labelStyle: TextStyle(color: MyColors.textHint),
+                                  labelStyle: TextStyle(
+                                    color: MyColors.textHint,
+                                  ),
                                   hintText: 'Минимум 4 символа',
                                   prefixIcon: const Icon(Icons.lock_outline),
                                   suffixIcon: IconButton(
                                     icon: Icon(
-                                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                      _obscurePassword
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
                                     ),
-                                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                    onPressed: () => setState(
+                                      () =>
+                                          _obscurePassword = !_obscurePassword,
+                                    ),
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
                                   ),
-                                  focusedBorder: OutlineInputBorder(                   // ← new
+                                  focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(color: MyColors.focusedBorder, width: 2),
+                                    borderSide: const BorderSide(
+                                      color: MyColors.focusedBorder,
+                                      width: 2,
+                                    ),
                                   ),
                                   filled: true,
                                   fillColor: MyColors.inputFill,
                                 ),
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) return 'Введите пароль';
-                                  if (value.length < 4) return 'Минимум 4 символа';
+                                  if (value == null || value.isEmpty)
+                                    return 'Введите пароль';
+                                  if (value.length < 4)
+                                    return 'Минимум 4 символа';
                                   return null;
                                 },
                               ),
                               const SizedBox(height: 20),
                               TextFormField(
                                 controller: _confirmPasswordController,
-                                autofillHints: const [AutofillHints.newPassword],
+                                autofillHints: const [
+                                  AutofillHints.newPassword,
+                                ],
                                 obscureText: _obscureConfirm,
                                 textInputAction: TextInputAction.done,
                                 onFieldSubmitted: (_) => _register(),
-                                autovalidateMode: AutovalidateMode.onUserInteraction,   // ← added
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
                                 decoration: InputDecoration(
                                   labelText: 'Подтверждение пароля',
-                                  labelStyle: TextStyle(color: MyColors.textHint),
+                                  labelStyle: TextStyle(
+                                    color: MyColors.textHint,
+                                  ),
                                   hintText: 'Повторите пароль',
                                   prefixIcon: const Icon(Icons.lock_outline),
                                   suffixIcon: IconButton(
                                     icon: Icon(
-                                      _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                                      _obscureConfirm
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
                                     ),
-                                    onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                                    onPressed: () => setState(
+                                      () => _obscureConfirm = !_obscureConfirm,
+                                    ),
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
                                   ),
-                                  focusedBorder: OutlineInputBorder(                   // ← new
+                                  focusedBorder: OutlineInputBorder(
+                                    // ← new
                                     borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(color: MyColors.focusedBorder, width: 2),
+                                    borderSide: const BorderSide(
+                                      color: MyColors.focusedBorder,
+                                      width: 2,
+                                    ),
                                   ),
                                   filled: true,
                                   fillColor: MyColors.inputFill,
                                 ),
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) return 'Подтвердите пароль';
-                                  if (value != _passwordController.text) return 'Пароли не совпадают';
+                                  if (value == null || value.isEmpty)
+                                    return 'Подтвердите пароль';
+                                  if (value != _passwordController.text)
+                                    return 'Пароли не совпадают';
                                   return null;
                                 },
                               ),
@@ -264,12 +313,18 @@ class _RegisterState extends State<Register> {
                                           width: 24,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2.5,
-                                            valueColor: AlwaysStoppedAnimation<Color>(MyColors.textLight),
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                  MyColors.textLight,
+                                                ),
                                           ),
                                         )
                                       : const Text(
                                           'Зарегистрироваться',
-                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
                                 ),
                               ),
@@ -283,7 +338,9 @@ class _RegisterState extends State<Register> {
                         child: RichText(
                           text: TextSpan(
                             text: 'Уже есть аккаунт? ',
-                            style: TextStyle(color: MyColors.textLight.withOpacity(0.9)),
+                            style: TextStyle(
+                              color: MyColors.textLight.withOpacity(0.9),
+                            ),
                             children: const [
                               TextSpan(
                                 text: 'Войти',

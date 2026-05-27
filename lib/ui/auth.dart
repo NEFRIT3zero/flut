@@ -88,7 +88,6 @@ class _AuthState extends ConsumerState<Auth> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Logo / Icon
                       const Icon(Icons.lock_outline, size: 80,
                           color: MyColors.textLight),
                       const SizedBox(height: 16),
@@ -110,7 +109,6 @@ class _AuthState extends ConsumerState<Auth> {
                         ),
                       ),
                       const SizedBox(height: 40),
-                      // Login card
                       Card(
                         elevation: 8,
                         shape: RoundedRectangleBorder(
@@ -257,7 +255,7 @@ class _AuthState extends ConsumerState<Auth> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   decoration: TextDecoration.underline,
-                                  color: MyColors.textLight, // explicit colour
+                                  color: MyColors.textLight, 
                                 ),
                               ),
                             ],
