@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "415059245540",
+    "project_id": "flut-cad5b",
+    "storage_bucket": "flut-cad5b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:415059245540:android:0a00e37cbc68f8f87aeff1",
+        "android_client_info": {
+          "package_name": "com.example.flut"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOTllOtSK_VzKymDeN3c2B7TqGGfUB67s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
