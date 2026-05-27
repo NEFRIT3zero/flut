@@ -36,15 +36,12 @@ class _RegisterState extends State<Register> {
     setState(() => _isLoading = true);
 
     try {
-      // Simulate a small delay to show the loading spinner (remove in production)
-      await Future.delayed(const Duration(milliseconds: 500));
-
       final user = User(
         name: _nameController.text.trim(),
         login: _loginController.text.trim(),
         password: _passwordController.text,
       );
-      await DatabaseController().insertUser(user);  // assume it's async
+      await DatabaseController().insertUser(user);  
 
       if (!mounted) return;
       Navigator.pop(context);

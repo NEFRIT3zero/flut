@@ -17,17 +17,17 @@ class ProductsDetails extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productsAsync = ref.watch(productProvider);
-    return Scaffold(
-      appBar: AppBar(),
-      body: productsAsync.when(
-        data: (products) {
-          final currentProduct = products.firstWhere(
-            (p) => p.qrData == product.qrData,
-          );
+    // return Scaffold(
+    //   appBar: AppBar(),
+    //   body: productsAsync.when(
+    //     data: (products) {
+    //       final currentProduct = products.firstWhere(
+    //         (p) => p.qrData == product.qrData,
+    //       );
 
-          return Column(
-            children: [
-              Image.memory(currentProduct.imageBytes, height: 200),
+    //       return Column(
+    //         children: [
+    //           Image.memory(currentProduct.imageBytes, height: 200),
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -78,11 +78,10 @@ class ProductsDetails extends ConsumerWidget {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                // Image – full width, no cropping
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(14),
-                                  child: Image.file(
-                                    File(currentProduct.pathImage),
+                                  child: Image.memory(
+                                    currentProduct.imageBytes,
                                     width: double.infinity,  // fills card width
                                     fit: BoxFit.fitWidth,    // height adjusts proportionally
                                     errorBuilder: (context, error, stackTrace) =>
